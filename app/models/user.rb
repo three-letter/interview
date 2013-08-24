@@ -3,13 +3,15 @@
 require 'digest/sha2'
 
 class User < ActiveRecord::Base
-	attr_accessible :login_count, :login_time, :name, :password, :pwd, :pwd_confirmation, :last_login_time
+	attr_accessible :login_count, :login_time, :name, :password, :pwd, :pwd_confirmation, :last_login_time, :status
 	attr_accessor :pwd
 
 	validates :name, :presence => { :message => "用户名不能为空!" },
 		:uniqueness => { :message => "用户名已经存在!" }
 	validates :pwd, :presence => { :on => :create, :message => "密码不能为空" },
 		:confirmation => { :message => "两次密码不一致" }
+
+	scope :active, lambda { where("status=1") }
 
 
 	before_save :encrypt_password

@@ -8,9 +8,10 @@ class UsersController < ApplicationController
 			if visitor_in?
 				@visitor = current_visitor
 				@visitor.last_visitor = Time.now
+				@visitor.status = 1
 				@visitor.save
 			else
-				@visitor = Visitor.new({:last_visitor => Time.now})
+				@visitor = Visitor.new({:status => 1, :last_visitor => Time.now})
 				@visitor.save
 			end
 			visitor_in @visitor

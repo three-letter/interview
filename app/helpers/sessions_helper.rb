@@ -7,7 +7,7 @@ module SessionsHelper
 	end
 
 	def visitor_in visitor
-		cookies.permanent.signed[:visitor_token] = visitor.id
+		cookies.permanent.signed[:visitor] = visitor.id
 	end
 
 	def current_visitor
@@ -15,10 +15,9 @@ module SessionsHelper
 	end
 	
 	def visitor_out visitor
-		@current_visitor = nil
-		cookies.permanent.signed[:visitor_token] = nil
 		visitor_time = (Time.now - visitor.last_visitor).to_i
-		visitor.visitor_time = visitor_time
+		visitor.visitor_time += visitor_time
+		visitor.status = 0
 		visitor.save
 	end
 
@@ -27,6 +26,7 @@ module SessionsHelper
 		cookies.permanent.signed[:token] = [user.id, user.salt]
 		user.login_count += 1
 		user.last_login_time = Time.now
+		user.status = 1
 		user.save
 	end
 
@@ -43,6 +43,7 @@ module SessionsHelper
 		cookies.permanent.signed[:token] = [nil, nil]
 		login_time = (Time.now - user.last_login_time).to_i
 		user.login_time += login_time
+		user.status = 0
 		user.save
 	end
 
@@ -67,6 +68,6 @@ module SessionsHelper
 		Visitor.authenticate_by_token(visitor_token)
 	end
 	def visitor_token
-		cookies.signed[:visitor_token] || nil
+		cookies.signed[:visitor] || nil
 	end
 end
